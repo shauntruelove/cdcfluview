@@ -133,7 +133,8 @@ pi_mortality <- function(coverage_area=c("national", "state", "region"), years=N
   }
 
   xdf[,c("seasonid", "baseline", "threshold", "percent_pni",
-         "percent_complete", "number_influenza", "number_pneumonia", "number_covid19",
+         "percent_complete",
+         "number_influenza", "number_pneumonia", "number_covid19",
          "all_deaths", "Total_PnI", "weeknumber", "geo_description",
          "age_label", "wk_start", "wk_end", "year_wk_num", "mmwrid",
          "coverage_area", "region_name", "callout")] -> xdf
