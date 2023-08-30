@@ -129,6 +129,7 @@ get_flu_data <- function(region="hhs", sub_region=1:10,
   # CDC API returns a ZIP file so we grab, save & expand it to then read in CSVs
 
   tmp <- httr::POST("https://gis.cdc.gov/grasp/flu2/PostPhase02DataDownload",
+                    config = httr::config(http_version=1),
                     body = params,
                     encode = "json",
                     httr::write_disk(out_file))

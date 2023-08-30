@@ -38,6 +38,7 @@ geographic_spread <- function(years=NULL) {
 
   httr::POST(
     url = "https://gis.cdc.gov/grasp/Flu8/PostPhase08DownloadData",
+    config = httr::config(http_version=1),
     httr::user_agent(.cdcfluview_ua),
     httr::add_headers(
       Origin = "https://gis.cdc.gov",

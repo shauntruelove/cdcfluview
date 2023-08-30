@@ -95,6 +95,7 @@ get_hosp_data <- function(area="flusurvnet", age_group="overall",
   # CDC API returns a ZIP file so we grab, save & expand it to then read in CSVs
 
   tmp <- httr::POST("https://gis.cdc.gov/GRASP/Flu3/PostPhase03DownloadData",
+                    config = httr::config(http_version=1),
                     body = params,
                     encode = "json",
                     httr::write_disk(out_file, overwrite = T))

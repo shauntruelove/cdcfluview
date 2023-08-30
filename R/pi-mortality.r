@@ -95,6 +95,7 @@ pi_mortality <- function(coverage_area=c("national", "state", "region"), years=N
 
   httr::POST(
     url = "https://gis.cdc.gov/grasp/flu7/PostPhase07DownloadData",
+    config = httr::config(http_version=1),
     httr::user_agent(.cdcfluview_ua),
     httr::add_headers(
       Origin = "https://gis.cdc.gov",

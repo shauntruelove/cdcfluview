@@ -44,6 +44,7 @@ utils::globalVariables(c(".", "mmwrid", "season", "seasonid", "week_start", "wk_
   httr::POST(
     httr::user_agent(.cdcfluview_ua),
     url = "https://gis.cdc.gov/GRASP/Flu3/PostPhase03DataTool",
+    config = httr::config(http_version=1),
     body = jsonlite::toJSON(body),
     encode = "raw",
     httr::accept_json(),

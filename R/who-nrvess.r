@@ -86,6 +86,7 @@ who_nrevss <- function(region=c("national", "hhs", "census", "state"), years=NUL
 
   httr::POST(
     url = "https://gis.cdc.gov/grasp/flu2/PostPhase02DataDownload",
+    config = httr::config(http_version=1),
     httr::user_agent(.cdcfluview_ua),
     httr::add_headers(
       Origin = "https://gis.cdc.gov",
