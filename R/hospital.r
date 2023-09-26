@@ -22,12 +22,15 @@
 #' hosp_eip <- hospitalizations("eip")
 #' hosp_ihsp <- hospitalizations("ihsp")
 #' }
-hospitalizations <- function(surveillance_area=c("flusurv", "eip", "ihsp"),
+hospitalizations <- function(surveillance_area=c("flusurv", "eip", "ihsp", "all"),
                              region="all", years=NULL) {
 
-  sarea <- match.arg(tolower(surveillance_area), choices = c("flusurv", "eip", "ihsp"))
-  sarea <- .surv_rev_map[sarea]
-
+  if (tolower(surveillance_area) != "all"){
+    sarea <- match.arg(tolower(surveillance_area), choices = c("flusurv", "eip", "ihsp"))
+    sarea <- .surv_rev_map[sarea]
+  } else {
+    sarea <- "ALL"
+  }
   meta <- .get_meta()
 
   # meta <- jsonlite::fromJSON("https://gis.cdc.gov/GRASP/Flu3/GetPhase03InitApp?appVersion=Public")
@@ -36,7 +39,6 @@ hospitalizations <- function(surveillance_area=c("flusurv", "eip", "ihsp"),
 
   reg <- region
   if (reg == "all") reg <- "Entire Network"
-
   tgt <- dplyr::filter(areas, (surveillance_area == sarea) & (region == reg))
 
   if (nrow(tgt) == 0) {
@@ -64,6 +66,7 @@ hospitalizations <- function(surveillance_area=c("flusurv", "eip", "ihsp"),
   mmwr_df <- hosp$meta$mmwr
   mmwr_df <- mmwr_df[,c("mmwrid", "weekend", "weeknumber", "weekstart", "year",
                         "yearweek", "seasonid", "weekendlabel", "weekendlabel2")]
+  mmwr_df$seasonid <- NULL
 
   catchments_df <- hosp$meta$catchments[,c("catchmentid", "beginseasonid", "endseasonid", "networkid", "name", "area")]
 
@@ -78,21 +81,19 @@ hospitalizations <- function(surveillance_area=c("flusurv", "eip", "ihsp"),
   # }
 
   xdf <- hosp$res
-
-  mmwr_df$seasonid <- NULL
   xdf <- dplyr::left_join(xdf, mmwr_df, "mmwrid")
-
   xdf <- dplyr::left_join(xdf, age_df, "ageid")
   xdf <- dplyr::left_join(xdf, race_df, "raceid")
   xdf <- dplyr::left_join(xdf, season_df, "seasonid")
 
   xdf$catchmentid <- as.character(xdf$catchmentid)
   catchments_df$catchmentid <- as.character(catchments_df$catchmentid)
-  catchments_df$networkid <- NULL
-  xdf <- dplyr::left_join(xdf, catchments_df, "catchmentid")
+  xdf <- dplyr::left_join(xdf, catchments_df, relationship = "many-to-many")
 
-  xdf$surveillance_area <- sarea
-  xdf$region <- reg
+  if (sarea != "ALL"){
+    xdf <- xdf %>% filter(name == tgt$surveillance_area & catchmentid == tgt$id)
+  }
+  xdf <- xdf %>% rename(surveillance_area = name, region = area)
 
 #   xdf <- xdf[,c("surveillance_area", "region", "year", "season", "wk_start", "wk_end",
 #                 "year_wk_num", "rate", "weeklyrate", "age", "age_label", "sea_label",
@@ -117,14 +118,14 @@ hospitalizations <- function(surveillance_area=c("flusurv", "eip", "ihsp"),
         )
       )
     }
-
     xdf <- xdf[xdf$seasonid %in% years, ]
-
   }
-
-  xdf
-
+  return(xdf)
 }
+
+
+
+
 
 #' Retrieve a list of valid sub-regions for each surveillance area.
 #'
