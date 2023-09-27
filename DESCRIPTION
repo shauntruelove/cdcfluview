@@ -49,5 +49,6 @@ Imports:
     purrr,
     readr,
     MMWRweek,
-    units (>= 0.4-6)
+    units (>= 0.4-6),
+    magrittr
 RoxygenNote: 7.2.1

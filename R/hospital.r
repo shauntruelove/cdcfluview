@@ -41,7 +41,7 @@ hospitalizations <- function(surveillance_area=c("flusurv", "eip", "ihsp", "all"
   if (reg == "all") reg <- "Entire Network"
   tgt <- dplyr::filter(areas, (surveillance_area == sarea) & (region == reg))
 
-  if (nrow(tgt) == 0) {
+  if (nrow(tgt) == 0 & surveillance_area !="all") {
     stop("Region not found. Use `surveillance_areas()` to see a list of valid inputs.",
          call.=FALSE)
   }
@@ -91,9 +91,9 @@ hospitalizations <- function(surveillance_area=c("flusurv", "eip", "ihsp", "all"
   xdf <- dplyr::left_join(xdf, catchments_df, relationship = "many-to-many")
 
   if (sarea != "ALL"){
-    xdf <- xdf %>% filter(name == tgt$surveillance_area & catchmentid == tgt$id)
+    xdf <- dplyr::filter(xdf, name == tgt$surveillance_area & catchmentid == tgt$id)
   }
-  xdf <- xdf %>% rename(surveillance_area = name, region = area)
+  xdf <- dplyr::rename(xdf, surveillance_area = name, region = area)
 
 #   xdf <- xdf[,c("surveillance_area", "region", "year", "season", "wk_start", "wk_end",
 #                 "year_wk_num", "rate", "weeklyrate", "age", "age_label", "sea_label",
